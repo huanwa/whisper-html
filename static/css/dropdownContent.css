@@ -1,0 +1,8 @@
+#dropdownContent a {
+    transition: background-color 0.2s ease-in-out!important; /* 确保过渡效果的优先级 */
+}
+
+#dropdownContent a:hover {
+    color: #fff !important; /* 为文字颜色添加 !important 确保优先级 */
+    background-color: #b3aeae !important; /* 为背景颜色添加 !important 确保优先级 */
+}
