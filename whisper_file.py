@@ -54,7 +54,7 @@ class WhisperTranscriptionFile:
                     "name": filename
                 },
                 "transcribe",
-                False
+                True
             ],
             "event_data": None,
             "fn_index": self.FN_INDEX,
