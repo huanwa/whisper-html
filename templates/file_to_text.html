@@ -1,0 +1,96 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   FreeTTS - Speech to Text
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .centered-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; /* 或者 min-height: 100vh; 根据需求选择 */
+  width: 100%; /* 根据侧边栏以外的内容区域宽度调整 */
+}
+  </style>
+</head>
+
+    <body>
+         <!-- Main Content 后的部分 -->
+         <div class="centered-content flex min-h-screen items-center justify-center p-6">
+            <div class="w-full max-w-4xl flex flex-col items-center justify-center">
+              <h2 class="text-3xl font-bold mb-2">
+                File to Text
+              </h2>
+              <p class="text-gray-600 mb-8">
+                Convert speech to text. Free online audio transcription services
+              </p>
+              <img alt="Illustration of a blue folder with audio file icons (mp3, wav, ogg) coming out of it" class="mb-8" src="https://placehold.co/300x300"/>
+              <h3 class="text-xl font-bold mb-2">
+                Adding Audio Files
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Support file formats: .mp3, .wav, .ogg
+              </p>
+          
+              <!-- 上传表单 -->
+              <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+               <!-- 由于用JavaScript进行文件处理，所以这里不需要action属性 -->
+               <input type="file" id="file-upload" name="file" accept=".mp3, .wav, .ogg" style="display: none;" />
+               <label for="file-upload" class="bg-black text-white py-2 px-6 rounded-full cursor-pointer">
+                 Upload my file
+               </label>
+             </form>
+            </div>
+          </div>
+
+
+
+
+          <script>
+            // 绑定事件到父元素，对动态加载的元素进行监听
+document.addEventListener('DOMContentLoaded', function(){
+    // 绑定事件到不会被动态加载替换的父元素上
+    document.body.addEventListener('change', function(event) {
+        // 事件委托：检查事件是否来自我们关心的file input
+        const element = event.target;
+        if (element && element.id === 'file-upload') {
+            // 确认选中了文件
+            if (element.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', element.files[0]);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('File uploaded successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Error uploading file!');
+                });
+            }
+        }
+    });
+});
+            </script>
+    </body>
+</html>

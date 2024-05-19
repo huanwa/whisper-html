@@ -1,0 +1,212 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   FreeTTS - Speech to Text
+  </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 调整 nav 的主体样式 */
+        nav#menu {
+  margin-top: 10px; /* 增加距离顶部的距离 */
+  font-size: 1rem; /* 控制文字大小 */
+}
+
+/* 调整链接的行高和间距 */
+nav#menu a {
+  line-height: 2.2; /* 调整行高 */
+  margin-bottom: 10px; /* 调整每个项目的间距 */
+}
+
+/* 调整图标和文本之间的间距 */
+nav#menu i {
+  margin-right: 18px; /* 原来设定可能是 3，现在调整回去 */
+}
+
+/* 针对所有链接设置基础样式 */
+nav#menu a {
+  display: block; /* 让链接填充整个父容器的宽度 */
+  padding: 10px 15px; /* 设置内边距 */
+  color: #474747; /* 设置默认文字颜色 */
+  text-decoration: none; /* 去除下划线 */
+  transition: background-color 0.3s ease; /* 背景色变化加上过渡动画 */
+}
+
+/* 当鼠标悬停时改变背景颜色 */
+nav#menu a:hover {
+  background-color: #e0e0e0; /* 鼠标悬停时的背景色 */
+}
+
+.user-profile img {
+  width: 50px; /* 可以根据喜好调整 */
+  height: 50px; /* 保持和宽度一致以形成圆形 */
+  border-radius: 40%; /* 圆形头像 */
+  border: 3px solid white; /* 可选：头像周围的边框 */
+}
+
+.user-profile span {
+  color: white; /* 用户名的文字颜色 */
+  font-weight: bold; /* 加粗用户名 */
+  margin-top: 8px; /* 头像与用户名之间的距离 */
+}
+
+.user-profile .logout-button {
+  color: white; /* 登出按钮文字颜色 */
+  opacity: 0.8; /* 登出按钮稍微透明 */
+  font-size: 0.875rem; /* 登出按钮的文字大小 */
+}
+
+.user-profile .logout-button:hover {
+  opacity: 1; /* 鼠标悬浮时按钮不透明 */
+  text-decoration: underline; /* 添加下划线 */
+}
+
+  </style>
+
+
+ </head>
+ <body class="bg-gray-100 flex flex-col lg:flex-row">
+  <div class="lg:w-1/5 bg-white p-6 lg:fixed lg:h-screen lg:overflow-y-auto">
+       <div class="mb-8 flex justify-between items-center lg:block">
+           <h1 class="text-2xl font-bold text-green-600">
+               Eyv Ai
+           </h1>
+           <button class="lg:hidden text-gray-700" id="menu-toggle">
+               <i class="fas fa-bars"></i>
+           </button>
+       </div>
+       <nav class="space-y-4 hidden lg:block" id="menu">
+        <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#" id="tabFileToText">
+       <i class="fas fa-volume-up mr-3"></i> File to Text
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabYouTubeToText">
+       <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabSetting">
+       <i class="fas fa-sliders-h mr-3"></i> Setting
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabAudioCutter">
+       <i class="fas fa-cut mr-3"></i> Audio Cutter
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabAudioJoiner">
+       <i class="fas fa-compress-arrows-alt mr-3"></i> Audio Joiner
+      </a>
+  </nav>
+
+
+  <div class="absolute bottom-0 left-0 w-full px-6 py-4">
+    {% if userinfo %}
+      <!-- 用户头像和名字的容器，让它们并排显示 -->
+      <div class="flex items-center justify-center mb-4">
+        <img src="{{ userinfo.picture }}" alt="User Avatar" class="w-6 h-6 rounded-full mr-2">
+        <span>{{ userinfo.name }}</span>
+      </div>
+      <!-- 独立的登出按钮 -->
+      <div class="text-center p-2 rounded-full" style="background-color:#48bb78;">
+        <a href="/logout" class="text-white text-sm">Sign out</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+  <div class="flex-1 flex items-center justify-center lg:ml-auto lg:w-4/5">
+    <div class="w-full px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+      <h2 class="text-3xl font-bold mb-2">
+        File to Text
+      </h2>
+      <p class="text-gray-600 mb-8">
+        Convert speech to text. Free online audio transcription services
+      </p>
+      <img alt="Illustration of a blue folder with audio file icons (mp3, wav, ogg) coming out of it" class="mb-8" src="https://placehold.co/300x300"/>
+      <h3 class="text-xl font-bold mb-2">
+        Adding Audio Files
+      </h3>
+      <p class="text-gray-600 mb-4">
+        Support file formats: .mp3, .wav, .ogg
+      </p>
+  
+      <!-- 上传表单 -->
+      <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+       <!-- 由于用JavaScript进行文件处理，所以这里不需要action属性 -->
+       <input type="file" id="file-upload" name="file" accept=".mp3, .wav, .ogg" style="display: none;" />
+       <label for="file-upload" class="bg-black text-white py-2 px-6 rounded-full cursor-pointer">
+         Upload my file
+       </label>
+     </form>
+    </div>
+  </div>
+
+
+  <script>
+   document.getElementById('menu-toggle').addEventListener('click', function () {
+            var menu = document.getElementById('menu');
+            var extraMenu = document.getElementById('extra-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                extraMenu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+                extraMenu.classList.add('hidden');
+            }
+        });
+  </script>
+
+
+
+<script>   
+      // 登出按钮事件处理
+      var logoutBtn = document.getElementById('logoutBtn');
+      logoutBtn.addEventListener('click', function() {
+          sessionStorage.clear(); // 清除sessionStorage中的用户信息
+          window.location.href = '/logout'; // 重定向到后端处理登出的路由
+      });
+</script>
+
+
+
+
+<script>
+  $(document).ready(function () {
+      // 监听文件输入域的变化，一旦有文件被选择，就自动提交表单
+      $('#file-upload').change(function () {
+          // 检查是否有文件
+          if ($(this).val()) {
+              var formData = new FormData($('#upload-form')[0]);
+  
+              // 通过AJAX发送表单数据
+              $.ajax({
+                  url: '/upload',
+                  type: 'POST',
+                  data: formData,
+                  contentType: false,  // 告诉jQuery不要设置Content-Type请求头
+                  processData: false,  // 告诉jQuery不要去处理发送的数据
+                  success: function (response) {
+                      console.log('File uploaded successfully');
+                      // 这里可以添加任何上传成功后的逻辑，比如显示上传成功信息或者处理返回的文件路径
+                  },
+                  error: function (xhr, status, error) {
+                      console.error('An error occurred during the file upload');
+                      console.error(error);
+                  }
+              });
+          }
+      });
+  });
+  </script>
+
+
+
+
+
+
+ </body>
+</html>
