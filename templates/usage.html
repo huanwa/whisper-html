@@ -1,0 +1,173 @@
+<html>
+<head>
+    <title>ListenRobo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("hidden");
+        }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex flex-col md:flex-row h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-full md:w-64 bg-white shadow-md md:block hidden">
+            <div class="flex items-center justify-center h-16 border-b">
+                <img alt="ListenRobo Logo" class="h-10 w-10" height="40" src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-MtfoW6nPwI28J9ApN02c48Jy/user-QP2kJ8tJuo3GOBTAGxdywXS3/img-6zii1EMohoyBYNmh11gPJT1K.png?st=2024-05-21T13%3A12%3A29Z&se=2024-05-21T15%3A12%3A29Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-05-21T10%3A09%3A59Z&ske=2024-05-22T10%3A09%3A59Z&sks=b&skv=2021-08-06&sig=K4QHbgwHBZZhnp0nMnXfYBrzL5R02%2BaMLvAp5iF3Hu4%3D" width="40"/>
+                <span class="ml-2 text-xl font-semibold">Eyv Ai</span>
+            </div>
+            <nav class="mt-4">
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">
+                    <i class="fas fa-microphone-alt mr-3"></i>
+                    Transcribe
+                </a>
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Transcriptions
+                </a>
+                <a class="flex items-center px-4 py-2 text-gray-700 bg-gray-200" href="#">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Usage
+                </a>
+            </nav>
+            <div class="mt-auto p-4">
+                <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
+                    <i class="fas fa-arrow-up mr-2"></i>
+                    Upgrade to Pro
+                </button>
+            </div>
+
+            
+        </div>
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <div class="flex justify-between items-center mb-6">
+             
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+             <div class="bg-white p-4 rounded-md shadow-md">
+              <h2 class="text-lg font-semibold">
+               Transcription Minutes
+              </h2>
+              <p class="text-2xl font-bold">
+               17.1
+               <span class="text-gray-500 text-lg">
+                used / 180
+               </span>
+              </p>
+              <p class="text-gray-500">
+               Monthly Renewal Date: Jun 18, 2024
+              </p>
+             </div>
+             <div class="bg-white p-4 rounded-md shadow-md">
+              <h2 class="text-lg font-semibold">
+               Summarization Words
+              </h2>
+              <p class="text-2xl font-bold">
+               0
+               <span class="text-gray-500 text-lg">
+                used / 0
+               </span>
+              </p>
+              <p class="text-gray-500">
+               Monthly Renewal Date: Jun 18, 2024
+              </p>
+             </div>
+            </div>
+            <div>
+             <h2 class="text-xl font-semibold mb-4">
+              Recent Transcriptions
+             </h2>
+             <div class="bg-white p-4 rounded-md shadow-md mb-4 flex justify-between items-center">
+              <div>
+               <div class="flex items-center mb-2">
+                <i class="fas fa-check-circle text-green-500 mr-2">
+                </i>
+                <span>
+                 1. Google's Text-to-Speech Google's text-to-speech technolog...
+                </span>
+               </div>
+               <div class="flex items-center text-gray-500 text-sm">
+                <i class="fas fa-calendar-alt mr-2">
+                </i>
+                <span>
+                 May 19, 2024
+                </span>
+                <i class="fas fa-language ml-4 mr-2">
+                </i>
+               </div>
+              </div>
+              <button class="bg-gray-800 text-white px-4 py-2 rounded-md">
+               Download
+              </button>
+             </div>
+             <div class="bg-white p-4 rounded-md shadow-md flex justify-between items-center">
+              <div>
+               <div class="flex items-center mb-2">
+                <i class="fas fa-check-circle text-green-500 mr-2">
+                </i>
+                <span>
+                 Hey everyone, if you haven't watched part 1 yet, please chec...
+                </span>
+               </div>
+               <div class="flex items-center text-gray-500 text-sm">
+                <i class="fas fa-calendar-alt mr-2">
+                </i>
+                <span>
+                 May 18, 2024
+                </span>
+                <i class="fas fa-language ml-4 mr-2">
+                </i>
+               </div>
+              </div>
+              <button class="bg-gray-800 text-white px-4 py-2 rounded-md">
+               Download
+              </button>
+             </div>
+            </div>
+           </div>
+    </div>
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden">
+        <div class="w-64 bg-white shadow-md">
+            <div class="flex items-center justify-center h-16 border-b">
+                <img alt="ListenRobo Logo" class="h-10 w-10" height="40" src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-MtfoW6nPwI28J9ApN02c48Jy/user-QP2kJ8tJuo3GOBTAGxdywXS3/img-6zii1EMohoyBYNmh11gPJT1K.png?st=2024-05-21T13%3A12%3A29Z&se=2024-05-21T15%3A12%3A29Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-05-21T10%3A09%3A59Z&ske=2024-05-22T10%3A09%3A59Z&sks=b&skv=2021-08-06&sig=K4QHbgwHBZZhnp0nMnXfYBrzL5R02%2BaMLvAp5iF3Hu4%3D" width="40"/>
+                <span class="ml-2 text-xl font-semibold">ListenRobo</span>
+                <button class="ml-auto mr-4 text-gray-500" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="mt-4">
+                <a class="flex items-center px-4 py-2 text-gray-700 bg-gray-200" href="#">
+                    <i class="fas fa-microphone-alt mr-3"></i>
+                    Transcribe
+                </a>
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">
+                    <i class="fas fa-align-left mr-3"></i>
+                    Summarize
+                </a>
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Transcriptions
+                </a>
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Usage
+                </a>
+                <a class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">
+                    <i class="fas fa-key mr-3"></i>
+                    API Key
+                </a>
+            </nav>
+            <div class="mt-auto p-4">
+                <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
+                    <i class="fas fa-arrow-up mr-2"></i>
+                    Upgrade to Pro
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
