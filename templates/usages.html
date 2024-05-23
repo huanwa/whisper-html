@@ -74,6 +74,27 @@ nav#menu a:hover {
         margin-left: calc(15.66667% + 1rem); /* Example for 1/6 width sidebar */
     }
 }
+
+
+.progress-bar {
+  width: 100%;
+  background-color: #f2f2f2;
+  height: 30px;
+}
+
+.progress {
+  background-color: #4CAF50;
+  height: 100%;
+  width: 0%;
+  transition: width 0.5s ease-in-out;
+}
+
+.text-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
   </style>
 
 
@@ -92,16 +113,14 @@ nav#menu a:hover {
         <a class="flex items-center text-gray-700 hover:text-black" href="/" id="tabFileToText">
        <i class="fas fa-volume-up mr-3"></i> File to Text
       </a>
-      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#" id="tabYouTubeToText">
+      <a class="flex items-center text-gray-700 hover:text-black" href="/getContentForYouTubeToText" id="tabYouTubeToText">
        <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
       </a>
-      <a class="flex items-center text-gray-700 hover:text-black" href="/usages" id="tabSetting">
+      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#">
         <i class="fas fa-chart-bar mr-3"></i>
         Usage
-      </a>
-      
+    </a>
   </nav>
-
   <div class="mt-auto p-4">
     <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
         <i class="fas fa-arrow-up mr-2"></i>
@@ -129,42 +148,25 @@ nav#menu a:hover {
   <!-- Main Content -->
   <div class="flex-1 p-6 main-content">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold">Transcribe</h1>
     </div>
-    <p class="text-gray-600 mb-4">A list of all the translations in your workspace.</p>
-    <table class="w-full bg-white border border-gray-200 rounded-lg">
-        <thead>
-            <tr class="bg-gray-100 text-gray-700">
-                <th class="py-2 px-4 text-left">Name</th>
-                <th class="py-2 px-4 text-left">Duration(s)</th>
-                <th class="py-2 px-4 text-left">Date</th>
-                <th class="py-2 px-4 text-left">Edit</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-t border-gray-200">
-                <td class="py-2 px-4">luvvoice.com-20240430-jlXL.mp3</td>
-                <td class="py-2 px-4">00:27</td>
-                
-                <td class="py-2 px-4">May 21, 2024 4:47 AM</td>
-               
-                <td class="py-2 px-4">
-                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
-                </td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="py-2 px-4">luvvoice.com-20240414-LV7T.mp3</td>
-                <td class="py-2 px-4">08:25</td>
-                
-                <td class="py-2 px-4">May 21, 2024 2:22 AM</td>
-                
-                <td class="py-2 px-4">
-                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+    <div class="grid grid-cols gap-4 mb-3">
+      <div class="bg-white p-9 rounded-md shadow-md">
+    <h2 class="text-lg font-semibold">
+     Transcription Minutes
+    </h2>
+    <div class="progress-bar">
+      <div id="progress" class="progress"></div>
+      <div class="text-container">
+        <span id="percentage">0%</span>
+        <span>used / 120</span>
+      </div>
+    </div>
+   </div>
+
+
+    
+    </div>
+  </div>
 
 
 
@@ -182,6 +184,15 @@ nav#menu a:hover {
         });
   </script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+  var percentage = 17.1; // 动态插入的数字
+  $("#progress").css("width", percentage + "%");
+  $("#percentage").text(percentage + "%");
+});
+</script>
+
 
 
 <script>   
@@ -192,6 +203,7 @@ nav#menu a:hover {
           window.location.href = '/logout'; // 重定向到后端处理登出的路由
       });
 </script>
+
 
 
  </body>
