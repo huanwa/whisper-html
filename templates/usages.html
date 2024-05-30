@@ -148,6 +148,7 @@ nav#menu a:hover {
   <!-- Main Content -->
   <div class="flex-1 p-6 main-content">
     <div class="flex items-center justify-between">
+<<<<<<< HEAD
         <!-- Optional content here-->
     </div>
     <div class="grid grid-cols gap-4 mb-3">
@@ -167,6 +168,27 @@ nav#menu a:hover {
 
     
 
+=======
+    </div>
+    <div class="grid grid-cols gap-4 mb-3">
+      <div class="bg-white p-9 rounded-md shadow-md">
+    <h2 class="text-lg font-semibold">
+     Transcription Minutes
+    </h2>
+    <div class="progress-bar">
+      <div id="progress" class="progress"></div>
+      <div class="text-container">
+        <span id="percentage">0%</span>
+        <span>used / 120</span>
+      </div>
+    </div>
+   </div>
+
+
+    
+    </div>
+  </div>
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 
 
 
@@ -185,6 +207,7 @@ nav#menu a:hover {
   </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<<<<<<< HEAD
 
 <script>
 $(document).ready(function() {
@@ -194,6 +217,14 @@ $(document).ready(function() {
             $("#percentage").text(percentage + "%");
             $("#minutes-used").text(minutesUsed.toFixed(1) + " used / 120");
         });
+=======
+<script>
+$(document).ready(function() {
+  var percentage = 17.1; // 动态插入的数字
+  $("#progress").css("width", percentage + "%");
+  $("#percentage").text(percentage + "%");
+});
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 </script>
 
 

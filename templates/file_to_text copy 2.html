@@ -74,6 +74,7 @@ nav#menu a:hover {
         margin-left: calc(15.66667% + 1rem); /* Example for 1/6 width sidebar */
     }
 }
+<<<<<<< HEAD
 
 #file-upload-area {
       position: relative;
@@ -175,6 +176,8 @@ nav#menu a:hover {
             background-color: #3aa768;
         }
 
+=======
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
   </style>
 
 
@@ -193,6 +196,7 @@ nav#menu a:hover {
         <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#" id="tabFileToText">
        <i class="fas fa-volume-up mr-3"></i> File to Text
       </a>
+<<<<<<< HEAD
       <a class="flex items-center text-gray-700 hover:text-black" href="/getContentForYouTubeToText" id="tabYouTubeToText">
        <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
       </a>
@@ -210,6 +214,22 @@ nav#menu a:hover {
     </button>
 </div>
 
+=======
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabYouTubeToText">
+       <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabSetting">
+       <i class="fas fa-sliders-h mr-3"></i> Setting
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabAudioCutter">
+       <i class="fas fa-cut mr-3"></i> Audio Cutter
+      </a>
+      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabAudioJoiner">
+       <i class="fas fa-compress-arrows-alt mr-3"></i> Audio Joiner
+      </a>
+  </nav>
+
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 
   <div class="absolute bottom-0 left-0 w-full px-6 py-4">
     {% if userinfo %}
@@ -227,6 +247,7 @@ nav#menu a:hover {
 </div>
 
 
+<<<<<<< HEAD
 
   <!-- Main Content -->
   <div class="flex-1 p-6 main-content">
@@ -252,10 +273,36 @@ nav#menu a:hover {
         </div>
       </div>
       <button class="w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700" onclick="uploadFile()">Transcribe</button>
+=======
+  <!-- Main Content -->
+  <div class="flex-1 p-6 main-content">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-semibold">Transcribe</h1>
+    </div>
+    <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-4">
+            <div class="flex">
+                <button class="flex-1 p-2 border rounded-l-lg text-center">Transcribe With File</button>
+                <button class="flex-1 p-2 border rounded-r-lg text-center">Transcribe With Link</button>
+            </div>
+        </div>
+        <div class="mb-4 p-4 border rounded-lg">
+        <p id="file-name" class="text-gray-500 text-center">No file selected</p>
+            <!-- 隐藏的文件选择器 -->
+            <input type="file" id="file-upload" name="file" accept=".mp3, .wav, .ogg" style="display: none;" onchange="updateFileName()" />
+            <!-- 点击这里触发文件选择器 -->
+            <p class="text-blue-500 text-center cursor-pointer" onclick="document.getElementById('file-upload').click()">Drag & Drop your file or <a>Browse</a></p>
+            <p class="text-gray-500 text-center">Maximum file size: 50 MB</p>
+            <p class="text-gray-500 text-center">Supports: MP3, MP4, WAV, WEBM, OGG, M4A, MPEG</p>
+        </div>
+        <!-- 点击时，上传文件 -->
+        <button class="w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700" onclick="uploadFile()">Transcribe</button>
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
     </div>
   </div>
 
 
+<<<<<<< HEAD
   <!-- 提示弹窗 -->
   <!-- 提示弹窗 -->
   <div id="uploadLimitModal" class="modal">
@@ -275,6 +322,8 @@ nav#menu a:hover {
 
 
 
+=======
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 
   <script>
    document.getElementById('menu-toggle').addEventListener('click', function () {
@@ -307,6 +356,7 @@ nav#menu a:hover {
 <script>
   // 更新文件名显示
   function updateFileName() {
+<<<<<<< HEAD
     const fileUpload = document.getElementById("file-upload");
     const fileNameDisplay = document.getElementById("file-name");
     if (fileUpload.files.length > 0) {
@@ -314,10 +364,20 @@ nav#menu a:hover {
     } else {
       fileNameDisplay.innerText = 'No file selected';
     }
+=======
+      const fileUpload = document.getElementById("file-upload");
+      const fileNameDisplay = document.getElementById("file-name");
+      if (fileUpload.files.length > 0) {
+          fileNameDisplay.innerText = fileUpload.files[0].name;
+      } else {
+          fileNameDisplay.innerText = 'No file selected';
+      }
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
   }
 
   // 处理文件上传的函数
   function uploadFile() {
+<<<<<<< HEAD
     const fileUpload = document.getElementById("file-upload");
     if (fileUpload.files.length === 0) {
       alert("Please select a file first!");
@@ -412,4 +472,36 @@ nav#menu a:hover {
 
 
 </body>
+=======
+      const fileUpload = document.getElementById("file-upload");
+      if (fileUpload.files.length === 0) {
+          alert("Please select a file first!");
+          return;
+      }
+      const formData = new FormData();
+      formData.append("file", fileUpload.files[0]);
+
+      // 在这里发送AJAX请求上传文件
+      fetch("/upload", {
+          method: "POST",
+          body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          // 处理上传后的数据，例如显示转录结果或者提示上传成功
+      })
+      .catch(error => {
+          console.error("Error:", error);
+      });
+  }
+</script>
+
+
+
+
+
+
+ </body>
+>>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 </html>
