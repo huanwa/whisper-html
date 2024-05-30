@@ -13,6 +13,8 @@ from dateutil.relativedelta import relativedelta
 from supabase import create_client, Client
 from whisper_url import WhisperTranscription
 from whisper_file import WhisperTranscriptionFile
+#from audio_transcriber import transcribe_audio
+import uuid
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -46,13 +48,10 @@ def allowed_file(filename):
 
 #处理文件的基本信息
 def process_uploaded_file(uploaded_file_name):
-    # 构建完整的文件路径
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file_name)
 
-     # 从session中获取用户邮箱
-    user_info = session.get('user')  # 假设你将整个token存储在session的'user'键下
+    user_info = session.get('user')
     if user_info:
-    # 假设这里的token结构中有一个包含email的userinfo字段
         userinfo = user_info.get('userinfo', {})
         user_email = userinfo.get('email')
     else:
@@ -65,13 +64,12 @@ def process_uploaded_file(uploaded_file_name):
         return 'File not found.'
 
     file_size = os.path.getsize(file_path)
-
     audio = MP3(file_path)
     audio_length = audio.info.length
-
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # 格式化时间
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     audio_details = {
+        'transcription_id': str(uuid.uuid4()),  # 生成唯一ID
         'file_name': uploaded_file_name,
         'user_email': user_email,
         'file_size_bytes': file_size,
@@ -80,6 +78,7 @@ def process_uploaded_file(uploaded_file_name):
     }
 
     return audio_details
+
     
 
 #上传文件之前，判断用户使用的时间
@@ -92,38 +91,22 @@ def get_current_month_range():
     end_of_month = start_of_month + relativedelta(months=1) - timedelta(seconds=1)
     return start_of_month, end_of_month
 
-def can_upload_file(user_email):
+def can_upload_file(user_email, new_upload_seconds=0):
     """
     检查用户在当前自然月内的上传时长是否超过了120分钟。
     """
-    # 获取当前月份的起始和结束时间
     start_of_month, end_of_month = get_current_month_range()
-    
-    # 构建查询
+
     query = supabase.table("audio_files") \
                     .select("audio_length_seconds") \
                     .filter("user_email", "eq", user_email) \
                     .filter("upload_time", "gte", start_of_month.isoformat()) \
                     .filter("upload_time", "lt", end_of_month.isoformat())
-    
-    # 执行查询并获取结果
+
     results = query.execute()
     
-    # 检查是否查询成功，这里是修正后的代码
-    try:
-        results = query.execute()
-        if not results or not results.data:
-            print("发生了错误，请检查API调用和数据。")
-        # 这里记录日志或通知用户
-        else:
-            total_length_this_month = sum(item['audio_length_seconds'] for item in results.data)
-        # 处理上传逻辑
-
-    except Exception as e:
-        print(f"处理请求时发生异常：{e}")
-    
-    # 判断是否超过120分钟
-    if total_length_this_month >= 7200:  # 120分钟换算成秒
+    total_seconds_this_month = sum(item['audio_length_seconds'] for item in results.data) if results.data else 0
+    if total_seconds_this_month + new_upload_seconds > 7200:  # 120分钟换算成秒
         return {"can_upload": False, "message": "Uploaded duration exceeds the maximum limit for this month."}
     else:
         return {"can_upload": True, "message": "You can upload the file."}
@@ -131,60 +114,104 @@ def can_upload_file(user_email):
 
 
 
-
-
-#上传文件
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'})
+        return jsonify({'error': 'No file part'}), 400
     
     file = request.files['file']
     if file.filename == '':
-        return jsonify({'error': 'No selected file'})
+        return jsonify({'error': 'No selected file'}), 400
     
     if file and allowed_file(file.filename):
-        # 从session中获取用户邮箱
-        user_info = session.get('user')  # 假设你将整个token存储在session的'user'键下
-        if user_info:
-            userinfo = user_info.get('userinfo', {})
-            user_email = userinfo.get('email')
-        else:
-            return jsonify({'error': 'User email not found'})
+        user_info = session.get('user')
+        if not user_info:
+            return jsonify({'error': 'User not logged in'}), 401
+        
+        userinfo = user_info.get('userinfo', {})
+        user_email = userinfo.get('email')
 
-        # 先判断本月使用时长
-        permission = can_upload_file(user_email)
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        file_details = process_uploaded_file(filename)
+        if 'error' in file_details:
+            return jsonify(file_details), 400
+
+        new_upload_seconds = file_details['audio_length_seconds']
+        permission = can_upload_file(user_email, new_upload_seconds=new_upload_seconds)
+
         if permission.get('can_upload'):
-            # 上传文件
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            
-            # 处理上传文件信息
-            file_details = process_uploaded_file(filename)
-            if 'error' not in file_details:
-                # 插入文件信息到数据库
+            whisper_file = WhisperTranscriptionFile()
+            try:
+                transcribed_text = whisper_file.transcribe(file_path)
+                if not transcribed_text:
+                    return jsonify({'error': 'Failed to transcribe file'}), 500
+                
+                # 更新文件详细信息
+                file_details['transcription_text'] = transcribed_text
                 response = supabase.table("audio_files").insert(file_details).execute()
+
                 if not response.data:
-                    return jsonify({'error': 'Failed to save file info to database'})
-                try:
-                    whisper_file = WhisperTranscriptionFile()
-                    transcribed_text = whisper_file.transcribe(file_path)
-                    print(transcribed_text)
-                    # 假设 transcribe 方法会抛出异常
-                except Exception as exc:
-                    return jsonify({'error': 'Failed to transcribe file', 'details': str(exc)})
+                    return jsonify({'error': 'Failed to save file info to database'}), 500
+
                 return jsonify({
                     'message': 'File uploaded and transcription successful',
                     'transcribed_text': transcribed_text
                 })
-            else:
-                return jsonify(file_details)
+            except Exception as exc:
+                return jsonify({'error': 'Failed to transcribe file', 'details': str(exc)}), 500
         else:
-            # 如果超过使用时长
-            return jsonify({"error": "Upload limit exceeded", "details": permission.get('message')})
-    
-    return jsonify({'error': 'File not allowed'})
+            return jsonify({"error": "Upload limit exceeded", "details": permission.get('message')}), 403
+
+    return jsonify({'error': 'File not allowed'}), 400
+
+
+
+@app.route("/history", methods=["GET"])
+def get_user_history():
+    user_info = session.get('user')
+    if user_info:
+        userinfo = user_info.get('userinfo', {})
+        user_email = userinfo.get('email')
+    else:
+        return jsonify({'error': 'User email not found'}), 400
+
+    query = supabase.table("audio_files").select("*").filter("user_email", "eq", user_email).filter("is_deleted", "eq", False).execute()
+    if query.data:
+        return jsonify(query.data)
+    else:
+        return jsonify([])
+
+
+
+
+@app.route('/transcription/<transcription_id>', methods=['GET'])
+def get_transcription(transcription_id):
+    try:
+        query = supabase.table('audio_files').select('*').filter('transcription_id', 'eq', transcription_id).execute()
+        if query.data:
+            return jsonify(query.data[0])
+        else:
+            return jsonify({'error': 'Transcription not found'}), 404
+    except Exception as e:
+        print(f"Error retrieving transcription: {e}")  # 打印错误信息
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+
+@app.route('/transcription/<transcription_id>', methods=['DELETE'])
+def delete_transcription(transcription_id):
+    try:
+        response = supabase.table('audio_files').update({'is_deleted': True}).eq('transcription_id', transcription_id).execute()
+        if response.data:
+            return jsonify({'message': 'Transcription marked as deleted successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to mark transcription as deleted'}), 500
+    except Exception as e:
+        print(f"Error marking transcription as deleted: {e}")  # 打印错误信息
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 
@@ -267,7 +294,7 @@ def home():
     
     # 如果userinfo存在，则认为用户已登录，渲染file_to_text copy.html
     if userinfo:
-        return render_template("file_to_text copy.html", userinfo=userinfo)
+        return render_template("file_to_text copy 2.html", userinfo=userinfo)
     # 如果userinfo不存在，则认为用户未登录，渲染index.html
     else:
         return render_template("index.html")
@@ -300,29 +327,46 @@ def get_content_for_file_to_text():
     # 根据需要渲染的模板来进行处理
     return render_template('file_to_text.html')
 
+
 # 对应 'YouTube to Text' 页面的内容
 @app.route('/getContentForYouTubeToText')
 def get_content_for_youtube_to_text():
-    # 根据需要渲染的模板来进行处理
-    return render_template('youtube_to_text.html')
+    # 尝试获取session中的userinfo
+    userinfo = session.get("user", {}).get("userinfo", None)
+    
+    # 如果userinfo存在，则认为用户已登录，渲染file_to_text copy.html
+    if userinfo:
+        return render_template("youtube_to_text.html", userinfo=userinfo)
+    # 如果userinfo不存在，则认为用户未登录，渲染index.html
+    else:
+        return render_template("index.html")
+    
 
-# 对应 'Setting' 页面的内容
-@app.route('/getContentForSetting')
-def get_content_for_setting():
-    # 根据需要渲染的模板来进行处理
-    return render_template('setting.html')
 
-# 对应 'Audio Cutter' 页面的内容
-@app.route('/getContentForAudioCutter')
-def get_content_for_audio_cutter():
-    # 根据需要渲染的模板来进行处理
-    return render_template('audio_cutter.html')
+@app.route('/usages')
+def get_usages():
+    userinfo = session.get("user", {}).get("userinfo", None)
+    
+    # 如果用户未登录，重定向到首页
+    if not userinfo:
+        return render_template("index.html")
 
-# 对应 'Audio Joiner' 页面的内容
-@app.route('/getContentForAudioJoiner')
-def get_content_for_audio_joiner():
-    # 根据需要渲染的模板来进行处理
-    return render_template('audio_joiner.html')
+    user_email = userinfo['email']
+    start_of_month, end_of_month = get_current_month_range()
+
+    query = supabase.table("audio_files") \
+                    .select("audio_length_seconds") \
+                    .filter("user_email", "eq", user_email) \
+                    .filter("upload_time", "gte", start_of_month.isoformat()) \
+                    .filter("upload_time", "lt", end_of_month.isoformat())
+    
+    results = query.execute()
+    total_seconds_this_month = sum(item['audio_length_seconds'] for item in results.data) if results.data else 0
+    total_minutes_this_month = total_seconds_this_month / 60
+
+    return render_template("usages.html", userinfo=userinfo, minutes_used=total_minutes_this_month)
+
+
 
 
 

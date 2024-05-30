@@ -6,3 +6,4 @@ certifi
 websocket-client
 mutagen
 supabase
+stripe

@@ -74,6 +74,107 @@ nav#menu a:hover {
         margin-left: calc(15.66667% + 1rem); /* Example for 1/6 width sidebar */
     }
 }
+
+#file-upload-area {
+      position: relative;
+    }
+    #upload-progress-container {
+      position: relative;
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 30px;  /* 适当增加高度以显示文字 */
+    }
+    #upload-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background-color: #48bb78;
+      transition: width 0.2s ease-in-out;
+    }
+    #progress-text {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white; /* 将文字颜色改为白色，以便在绿色背景上呈现 */
+      font-weight: bold;
+    }
+
+    /* 弹窗样式 */
+    .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #aaa;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+        }
+
+        .modal-body {
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background-color: #48bb78;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #3aa768;
+        }
+
   </style>
 
 
@@ -92,19 +193,22 @@ nav#menu a:hover {
         <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#" id="tabFileToText">
        <i class="fas fa-volume-up mr-3"></i> File to Text
       </a>
-      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabYouTubeToText">
+      <a class="flex items-center text-gray-700 hover:text-black" href="/getContentForYouTubeToText" id="tabYouTubeToText">
        <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
       </a>
-      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabSetting">
-       <i class="fas fa-sliders-h mr-3"></i> Setting
+      <a class="flex items-center text-gray-700 hover:text-black" href="/usages" id="tabSetting">
+        <i class="fas fa-chart-bar mr-3"></i>
+        Usage
       </a>
-      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabAudioCutter">
-       <i class="fas fa-cut mr-3"></i> Audio Cutter
-      </a>
-      <a class="flex items-center text-gray-700 hover:text-black" href="#" id="tabAudioJoiner">
-       <i class="fas fa-compress-arrows-alt mr-3"></i> Audio Joiner
-      </a>
+      
   </nav>
+
+  <div class="mt-auto p-4">
+    <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
+        <i class="fas fa-arrow-up mr-2"></i>
+        Upgrade to Pro
+    </button>
+</div>
 
 
   <div class="absolute bottom-0 left-0 w-full px-6 py-4">
@@ -123,31 +227,52 @@ nav#menu a:hover {
 </div>
 
 
+
   <!-- Main Content -->
   <div class="flex-1 p-6 main-content">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold">Transcribe</h1>
+      <h1 class="text-2xl font-semibold">Transcribe</h1>
     </div>
     <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
-        <div class="mb-4">
-            <div class="flex">
-                <button class="flex-1 p-2 border rounded-l-lg text-center">Transcribe With File</button>
-                <button class="flex-1 p-2 border rounded-r-lg text-center">Transcribe With Link</button>
-            </div>
+      <div class="mb-4">
+        <div class="flex">
+          <button class="flex-1 p-2 border rounded-l-lg text-center">Transcribe With File</button>
+          <button class="flex-1 p-2 border rounded-r-lg text-center">Transcribe With Link</button>
         </div>
-        <div class="mb-4 p-4 border rounded-lg">
+      </div>
+      <div class="mb-4 p-4 border rounded-lg" id="file-upload-area">
         <p id="file-name" class="text-gray-500 text-center">No file selected</p>
-            <!-- 隐藏的文件选择器 -->
-            <input type="file" id="file-upload" name="file" accept=".mp3, .wav, .ogg" style="display: none;" onchange="updateFileName()" />
-            <!-- 点击这里触发文件选择器 -->
-            <p class="text-blue-500 text-center cursor-pointer" onclick="document.getElementById('file-upload').click()">Drag & Drop your file or <a>Browse</a></p>
-            <p class="text-gray-500 text-center">Maximum file size: 50 MB</p>
-            <p class="text-gray-500 text-center">Supports: MP3, MP4, WAV, WEBM, OGG, M4A, MPEG</p>
+        <input type="file" id="file-upload" name="file" accept=".mp3, .wav, .ogg" style="display: none;" onchange="updateFileName()" />
+        <p class="text-blue-500 text-center cursor-pointer" onclick="document.getElementById('file-upload').click()">Drag & Drop your file or <a>Browse</a></p>
+        <p class="text-gray-500 text-center">Maximum file size: 50 MB</p>
+        <p class="text-gray-500 text-center">Supports: MP3, MP4, WAV, WEBM, OGG, M4A, MPEG</p>
+        <div id="upload-progress-container" style="display: none;">
+          <div id="upload-progress" class="progress-bar"></div>
+          <p id="progress-text">文件上传中...</p>
         </div>
-        <!-- 点击时，上传文件 -->
-        <button class="w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700" onclick="uploadFile()">Transcribe</button>
+      </div>
+      <button class="w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700" onclick="uploadFile()">Transcribe</button>
     </div>
   </div>
+
+
+  <!-- 提示弹窗 -->
+  <!-- 提示弹窗 -->
+  <div id="uploadLimitModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>提示</h2>
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p id="modal-text">您的上传已超过本月使用时长。</p>
+            <button class="btn-primary" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+</div>
+
+    
+
 
 
 
@@ -182,45 +307,109 @@ nav#menu a:hover {
 <script>
   // 更新文件名显示
   function updateFileName() {
-      const fileUpload = document.getElementById("file-upload");
-      const fileNameDisplay = document.getElementById("file-name");
-      if (fileUpload.files.length > 0) {
-          fileNameDisplay.innerText = fileUpload.files[0].name;
-      } else {
-          fileNameDisplay.innerText = 'No file selected';
-      }
+    const fileUpload = document.getElementById("file-upload");
+    const fileNameDisplay = document.getElementById("file-name");
+    if (fileUpload.files.length > 0) {
+      fileNameDisplay.innerText = fileUpload.files[0].name;
+    } else {
+      fileNameDisplay.innerText = 'No file selected';
+    }
   }
 
   // 处理文件上传的函数
   function uploadFile() {
-      const fileUpload = document.getElementById("file-upload");
-      if (fileUpload.files.length === 0) {
-          alert("Please select a file first!");
-          return;
+    const fileUpload = document.getElementById("file-upload");
+    if (fileUpload.files.length === 0) {
+      alert("Please select a file first!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileUpload.files[0]);
+
+    const uploadProgress = document.getElementById('upload-progress');
+    const progressText = document.getElementById('progress-text');
+    const uploadProgressContainer = document.getElementById('upload-progress-container');
+    
+    uploadProgress.style.width = '0%';
+    uploadProgressContainer.style.display = 'block';
+    progressText.innerText = '文件上传中...';
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", function(event) {
+      if (event.lengthComputable) {
+        const percentComplete = (event.loaded / event.total) * 100;
+        uploadProgress.style.width = percentComplete + '%';
       }
-      const formData = new FormData();
-      formData.append("file", fileUpload.files[0]);
+    }, false);
 
-      // 在这里发送AJAX请求上传文件
-      fetch("/upload", {
-          method: "POST",
-          body: formData,
-      })
-      .then(response => response.json())
-      .then(data => {
-          console.log(data);
-          // 处理上传后的数据，例如显示转录结果或者提示上传成功
-      })
-      .catch(error => {
-          console.error("Error:", error);
-      });
+    xhr.addEventListener("load", function(event) {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const response = JSON.parse(xhr.responseText);
+      if (response.error && response.error === "Upload limit exceeded") {
+        showModal(response.details);
+      } else {
+        progressText.innerText = '正在转录...';
+        // Simulate the transcription step
+        setTimeout(() => {
+          progressText.innerText = '转录成功！';
+          uploadProgress.style.width = '100%';
+        }, 3000); // 假设转录需要3秒
+      }
+    } else {
+      // 处理错误状态码
+      console.error("File upload failed:", xhr.status, xhr.responseText);
+      const response = JSON.parse(xhr.responseText);
+      if (response.error && response.error === "Upload limit exceeded") {
+        showModal(response.details); // 显示后端返回的详细信息
+      } else {
+        // 其他错误，例如文件类型错误、网络错误等
+        showModal("上传文件时出错，请稍后再试。");
+      }
+    }
+  }, false);
+
+    xhr.addEventListener("error", function(event) {
+      console.error("An error occurred while uploading the file.");
+      alert("An error occurred while uploading the file.");
+    }, false);
+
+    xhr.open("POST", "/upload");
+    xhr.send(formData);
   }
-</script>
+
+  // 显示提示弹窗的函数
+  // 显示提示弹窗的函数
+  function showModal(message) {
+                const modal = document.getElementById("uploadLimitModal");
+                const modalText = document.getElementById("modal-text");
+                modalText.innerText = message;
+                modal.style.display = "block";
+            }
+
+            // 关闭弹窗的函数
+            function closeModal() {
+                const modal = document.getElementById("uploadLimitModal");
+                modal.style.display = "none";
+            }
+
+            // 处理弹窗关闭按钮和点击背景关闭
+            window.onclick = function (event) {
+                const modal = document.getElementById("uploadLimitModal");
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            const closeBtn = document.getElementById("closeModal");
+            closeBtn.onclick = function () {
+                const modal = document.getElementById("uploadLimitModal");
+                modal.style.display = "none";
+            }
+        </script>
 
 
 
-
-
-
- </body>
+</body>
 </html>
