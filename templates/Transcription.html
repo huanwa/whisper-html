@@ -74,7 +74,6 @@ nav#menu a:hover {
         margin-left: calc(15.66667% + 1rem); /* Example for 1/6 width sidebar */
     }
 }
-<<<<<<< HEAD
 
 /* 每个转录条目的样式 */
 .transcription-entry-container {
@@ -230,22 +229,19 @@ nav#menu a:hover {
     }
 }
 
-
+.hidden {
+    display: none;
+}
          
 
 
         
-=======
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
   </style>
 
 
  </head>
  <body class="bg-gray-100 flex flex-col lg:flex-row">
-<<<<<<< HEAD
     
-=======
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
   <div class="lg:w-1/6 bg-white p-6 lg:fixed lg:h-screen lg:overflow-y-auto">
        <div class="mb-8 flex justify-between items-center lg:block">
            <h1 class="text-2xl font-bold text-green-600">
@@ -259,12 +255,8 @@ nav#menu a:hover {
         <a class="flex items-center text-gray-700 hover:text-black" href="/" id="tabFileToText">
        <i class="fas fa-volume-up mr-3"></i> File to Text
       </a>
-<<<<<<< HEAD
-      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="/getContentForYouTubeToText" id="tabYouTubeToText">
-=======
-      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#" id="tabYouTubeToText">
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
-       <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
+      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="/Transcription" id="Transcription">
+       <i class="fas fa-microphone-alt mr-3"></i> Transcriptions
       </a>
       <a class="flex items-center text-gray-700 hover:text-black" href="/usages" id="tabSetting">
         <i class="fas fa-chart-bar mr-3"></i>
@@ -274,10 +266,14 @@ nav#menu a:hover {
   </nav>
 
   <div class="mt-auto p-4">
-    <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
-        <i class="fas fa-arrow-up mr-2"></i>
-        Upgrade to Pro
-    </button>
+    {% if not is_paid_user %}
+    <a href="/price">
+        <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
+            <i class="fas fa-arrow-up mr-2"></i>
+            Upgrade to Pro
+        </button>
+    </a>
+    {% endif %}
 </div>
 
 
@@ -299,8 +295,8 @@ nav#menu a:hover {
 
   <!-- Main Content -->
   <div class="flex-1 p-6 main-content">
-    <!-- 添加了新的div容器，包含bg-white, p-9, rounded-md, 和 shadow-md类 -->
     <div class="bg-white p-9 rounded-md shadow-md overflow-x-auto">
+        <!-- Transcription History Section -->
         <div id="transcription-history-section">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-semibold">Transcription History</h1>
@@ -321,18 +317,30 @@ nav#menu a:hover {
                 </table>
             </div>
         </div>
-    </div>
-</div>
 
-
-    <!-- 转录详细结果的部分 -->
-    <div class="mt-6 bg-white p-6 rounded-lg shadow-md hidden" id="transcription-detail">
-        <h2 class="text-xl font-semibold">Transcription Detail</h2>
-        <div id="transcription-info" class="transcription-entry-container">
-            <!-- 详细结果将在这里动态填充 -->
+        <!-- Transcription Details Section -->
+        <div class="mt-6 bg-white p-6 hidden" id="transcription-detail">
+            <div class="flex justify-between">
+                <h2 class="text-xl font-semibold">Transcription Detail</h2>
+                <div class="relative inline-block text-left">
+                    <button id="downloadButton" class="bg-blue-500 text-white px-4 py-2 rounded-md focus:outline-none">
+                        Download
+                    </button>
+                    <div id="downloadMenu" class="hidden absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                            <a href="#" data-format="txt" class="download-option block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">TXT</a>
+                            <a href="#" data-format="srt" class="download-option block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">SRT</a>
+                            <a href="#" data-format="vtt" class="download-option block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">VTT</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="transcription-info" class="transcription-entry-container">
+                <!-- 详细结果将在这里动态填充 -->
+            </div>
         </div>
     </div>
-</div>
+  </div>
 
 
  <!-- Custom Modals -->
@@ -402,21 +410,45 @@ nav#menu a:hover {
             });
         });
 
-        function viewDetail(transcription_id) {
-            $.get(`/transcription/${transcription_id}`, function (data) {
-                if (data.error) {
-                    alert(data.error);
-                    $('#transcription-detail').hide();
-                } else {
-                    const formattedText = formatTranscriptionText(data.transcription_text);
-                    $('#transcription-info').html(formattedText);
-                    $('#transcription-history-section').hide();  // 隐藏转录历史列表
-                    $('#transcription-detail').show();  // 显示转录详细信息
-                }
-            }).fail(function (xhr) {
-                alert('Failed to load transcription detail. Error: ' + xhr.responseText);
-            });
+
+    $(document).ready(function () {
+    // 下拉菜单显示/隐藏
+    $("#downloadButton").click(function () {
+        $("#downloadMenu").toggleClass("hidden");
+    });
+
+    // 点击下载选项时处理下载逻辑
+    $(".download-option").click(function (e) {
+        e.preventDefault();
+        var format = $(this).data("format");
+        var transcriptionId = $('#transcription-info').data('transcription-id');
+
+        if (transcriptionId) {
+            window.location.href = "/download/" + transcriptionId + "/" + format;
+        } else {
+            alert("Transcription ID is not defined.");
         }
+        $("#downloadMenu").addClass("hidden");
+    });
+});
+
+function viewDetail(transcription_id) {
+    $.get(`/transcription/${transcription_id}`, function (data) {
+        if (data.error) {
+            alert(data.error);
+            $('#transcription-detail').addClass('hidden');
+        } else {
+            // 正确设置 transcription_id
+            $('#transcription-info').data('transcription-id', transcription_id); 
+            const formattedText = formatTranscriptionText(data.transcription_text);
+            $('#transcription-info').html(formattedText);
+            $('#transcription-history-section').addClass('hidden');
+            $('#transcription-detail').removeClass('hidden');
+        }
+    }).fail(function (xhr) {
+        alert('Failed to load transcription detail. Error: ' + xhr.responseText);
+    });
+}
 
         function deleteTranscription(transcription_id) {
             showCustomModal(transcription_id); 
@@ -455,47 +487,6 @@ nav#menu a:hover {
     </script>
 
 
-=======
-    <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold">Transcribe</h1>
-    </div>
-    <p class="text-gray-600 mb-4">A list of all the translations in your workspace.</p>
-    <table class="w-full bg-white border border-gray-200 rounded-lg">
-        <thead>
-            <tr class="bg-gray-100 text-gray-700">
-                <th class="py-2 px-4 text-left">Name</th>
-                <th class="py-2 px-4 text-left">Duration(s)</th>
-                <th class="py-2 px-4 text-left">Date</th>
-                <th class="py-2 px-4 text-left">Edit</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-t border-gray-200">
-                <td class="py-2 px-4">luvvoice.com-20240430-jlXL.mp3</td>
-                <td class="py-2 px-4">00:27</td>
-                
-                <td class="py-2 px-4">May 21, 2024 4:47 AM</td>
-               
-                <td class="py-2 px-4">
-                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
-                </td>
-            </tr>
-            <tr class="border-t border-gray-200">
-                <td class="py-2 px-4">luvvoice.com-20240414-LV7T.mp3</td>
-                <td class="py-2 px-4">08:25</td>
-                
-                <td class="py-2 px-4">May 21, 2024 2:22 AM</td>
-                
-                <td class="py-2 px-4">
-                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 
   <script>
    document.getElementById('menu-toggle').addEventListener('click', function () {
@@ -509,17 +500,13 @@ nav#menu a:hover {
                 extraMenu.classList.add('hidden');
             }
         });
-<<<<<<< HEAD
 
 
         
-=======
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
   </script>
 
 
 
-<<<<<<< HEAD
 <script>
     function showCustomModal(transcription_id) {
             const modal = document.getElementById("customModal");
@@ -582,8 +569,6 @@ nav#menu a:hover {
 </script>
 
 
-=======
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 <script>   
       // 登出按钮事件处理
       var logoutBtn = document.getElementById('logoutBtn');
@@ -592,6 +577,9 @@ nav#menu a:hover {
           window.location.href = '/logout'; // 重定向到后端处理登出的路由
       });
 </script>
+
+
+
 
 
  </body>

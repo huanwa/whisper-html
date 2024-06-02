@@ -20,12 +20,7 @@ window.onload = function() {
         userProfile.innerHTML = `<img src="${userInfo.picture}" alt="User Photo" style="width:50px; height:auto; border-radius:50%;">`;
         userEmail.textContent = userInfo.email;
 
-        // 处理下拉菜单的显示和隐藏
-        userProfile.addEventListener("click", function(e) {
-            e.preventDefault();
-            var dropdown = document.getElementById("dropdownContent");
-            dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
-        });
+        
     }
 }
 
@@ -44,3 +39,6 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
     // 发送用户到后端进行登出处理的路由
     window.location.href = '/logout';
 });
+
+
+

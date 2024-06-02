@@ -113,19 +113,23 @@ nav#menu a:hover {
         <a class="flex items-center text-gray-700 hover:text-black" href="/" id="tabFileToText">
        <i class="fas fa-volume-up mr-3"></i> File to Text
       </a>
-      <a class="flex items-center text-gray-700 hover:text-black" href="/getContentForYouTubeToText" id="tabYouTubeToText">
-       <i class="fas fa-microphone-alt mr-3"></i> YouTube to Text
+      <a class="flex items-center text-gray-700 hover:text-black" href="/Transcription" id="Transcription">
+       <i class="fas fa-microphone-alt mr-3"></i> Transcriptions
       </a>
-      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="#">
+      <a class="flex items-center text-white bg-green-500 p-2 rounded-md" href="/usages">
         <i class="fas fa-chart-bar mr-3"></i>
         Usage
     </a>
   </nav>
   <div class="mt-auto p-4">
-    <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
-        <i class="fas fa-arrow-up mr-2"></i>
-        Upgrade to Pro
-    </button>
+    {% if not is_paid_user %}
+    <a href="/price">
+        <button class="w-full py-2 px-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-yellow-500">
+            <i class="fas fa-arrow-up mr-2"></i>
+            Upgrade to Pro
+        </button>
+    </a>
+    {% endif %}
 </div>
 
 
@@ -148,7 +152,6 @@ nav#menu a:hover {
   <!-- Main Content -->
   <div class="flex-1 p-6 main-content">
     <div class="flex items-center justify-between">
-<<<<<<< HEAD
         <!-- Optional content here-->
     </div>
     <div class="grid grid-cols gap-4 mb-3">
@@ -168,27 +171,6 @@ nav#menu a:hover {
 
     
 
-=======
-    </div>
-    <div class="grid grid-cols gap-4 mb-3">
-      <div class="bg-white p-9 rounded-md shadow-md">
-    <h2 class="text-lg font-semibold">
-     Transcription Minutes
-    </h2>
-    <div class="progress-bar">
-      <div id="progress" class="progress"></div>
-      <div class="text-container">
-        <span id="percentage">0%</span>
-        <span>used / 120</span>
-      </div>
-    </div>
-   </div>
-
-
-    
-    </div>
-  </div>
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
 
 
 
@@ -207,25 +189,25 @@ nav#menu a:hover {
   </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<<<<<<< HEAD
 
 <script>
-$(document).ready(function() {
-            var minutesUsed = {{ minutes_used | safe }};
-            var percentage = (minutesUsed / 120 * 100).toFixed(1);
-            $("#progress").css("width", percentage + "%");
-            $("#percentage").text(percentage + "%");
-            $("#minutes-used").text(minutesUsed.toFixed(1) + " used / 120");
-        });
-=======
-<script>
-$(document).ready(function() {
-  var percentage = 17.1; // 动态插入的数字
-  $("#progress").css("width", percentage + "%");
-  $("#percentage").text(percentage + "%");
-});
->>>>>>> 77a8ee3406c810153138392fd2888de0b341ec56
-</script>
+  $(document).ready(function() {
+      try {
+          // 确保从模板中获取到数据并设置默认
+          var minutesUsed = {{ minutes_used|default(0) | safe }};
+          var percentage = (minutesUsed / 120 * 100).toFixed(1);
+
+          $("#progress").css("width", percentage + "%");
+          $("#percentage").text(percentage + "%");
+          $("#minutes-used").text(minutesUsed.toFixed(1) + " used / 120");
+      } catch(error) {
+          console.error('Error parsing minutes_used:', error);
+          $("#progress").css("width", "0%");
+          $("#percentage").text("0%");
+          $("#minutes-used").text("0 used / 120");
+      }
+  });
+  </script>
 
 
 
